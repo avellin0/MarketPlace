@@ -1,0 +1,100 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  name       String
+  password   String
+  creat_at   DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  UserAccess UserAccess[]
+
+  Sale_as_buyer Sale[] @relation("buyer")
+
+  Sale_as_seller Sale[] @relation("seller")
+
+  Store Store[]
+}
+
+model UserAccess {
+  id String @id @default(uuid())
+
+  User   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  Access   Access? @relation(fields: [accessId], references: [id])
+  accessId String?
+
+  creat_at   DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Access {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  creat_at   DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  UserAccess UserAccess[]
+}
+
+model Product {
+  id         String   @id @default(uuid())
+  name       String
+  price      Float
+  amount     Int
+  creat_at   DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  Store       Store?        @relation(fields: [storeId], references: [id])
+  storeId     String?
+  SaleProduct SaleProduct[]
+}
+
+model Store {
+  id         String   @id @default(uuid())
+  name       String
+  creat_at   DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  product Product[]
+
+  User   User?   @relation(fields: [userId], references: [id])
+  userId String?
+}
+
+model Sale {
+  id          String        @id @default(uuid())
+  total_value Float
+  buyer       User?         @relation("buyer", fields: [buyerId], references: [id])
+  buyerId     String?
+  seller      User?         @relation("seller", fields: [sellerId], references: [id])
+  sellerId    String?
+  SaleProduct SaleProduct[]
+  
+  creat_at   DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+  
+model SaleProduct {
+  id        String  @id @default(uuid())
+  quantity  Int
+  Sale      Sale    @relation(fields: [saleId], references: [id])
+  saleId    String
+  Product   Product @relation(fields: [productId], references: [id])
+  productId String
+
+  creat_at   DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
