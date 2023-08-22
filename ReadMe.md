@@ -4,6 +4,8 @@
 - Brypt
 - TSX
 - Express
+- Prisma
+- Postgres
 
 # Novas Features:
 
